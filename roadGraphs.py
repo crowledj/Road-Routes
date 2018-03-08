@@ -13,14 +13,6 @@ import copy
 
 
 ## declaration if some utility functions :
-import operator as op
-def ncr(n, r):
-    r = min(r, n-r)
-    if r == 0: return 1
-    numer = reduce(op.mul, xrange(n, n-r, -1))
-    denom = reduce(op.mul, xrange(1, r+1))
-    return numer//denom
-
 
 def pairwise(lst):
     """ yield item i and item i+1 in lst. e.g.
@@ -35,7 +27,7 @@ def pairwise(lst):
 
 
 class roadGraph:
-    """This class implements a directed, weighted graph with nodes represented by integers. """
+    """This class implements a directed, weighted graph with nodes represented by characters. """
 
     def __init__(self):
         """Initializes this digraph.
@@ -97,18 +89,22 @@ class roadGraph:
         self.parents_length[head][tail]=dist
         self.edges += 1
 
-    def printAllPathsUtil(self, start, end, visited, path):
+    def searchAllPathsUtil(self, start, end, visited, path):
         
         global paths_list
         global dist_list
         global num_town_list
 
+        global graph_copy 
 
         # Mark the current node as visited and store in path
-        #also can't have a town link to itself but can return to a given town:        
-        visited[self.nodes_mapping[start]]= True
-        path.append(start)
-
+        #also can't have a town link to itself but can return to a given town:   
+        
+        if len(path) >2 and (path[-1] != path[-2]) :
+            visited[self.nodes_mapping[start]]= True
+            
+        path.append(start)      
+            
         # If current vertex is same as destination, then print
         # current path[]
        
@@ -117,7 +113,10 @@ class roadGraph:
             route_dist=0
             for twn in range(len(path)-1):
                 route_dist+=self.parents_length[path[twn]][path[twn+1]]
-            print(str(path) + " --  num_towns = " + str(num_towns) + " --  length trip =  "  + str(route_dist) + "\n")
+            
+            ## Useful Debugging - extra logging print..
+            
+            #print(str(path) + " --  num_towns = " + str(num_towns) + " --  length trip =  "  + str(route_dist) + "\n")
             
             path_copy=copy.copy(path)
             paths_list.append(path_copy)
@@ -130,57 +129,12 @@ class roadGraph:
             for i in self.nodes[start]:
                 if visited[self.nodes_mapping[i]]==False :
 
-                    self.printAllPathsUtil(i, end, visited, path)
+                    self.searchAllPathsUtil(i, end, visited, path)
 
         # Remove current vertex from path[] and mark it as unvisited
         path.pop()
         visited[self.nodes_mapping[start]]= False        
     
-            
-    
-
-    # visits all the nodes of a graph (connected component) using BFS
-    def bfs_connected_component(self, start,end,length):
-        #
-        path = []
-                
-        global paths_list
-        global dist_list
-        global num_town_list 
-        
-        global glob_iter
-        
-        #path[0]=start
-        # keep track of nodes to be checked
-        queue = [start]
-    
-        # keep looping until there are nodes still to be checked
-        while queue:
-            glob_iter+=1
-            # pop shallowest node (first node) from queue
-            #path=queue[-1]
-            node = queue.pop(0)
-            #if node not in explored:
-                # add node to list of checked nodes
-                
-            path.append(node)
-            last=path[-1]
-            if (last == end and len(path) < 10):
-                print(path)
-                print("\n")
-                #break
-            neighbours = self.nodes[node]
-
-            # add neighbours of node to queue
-            for neighbour in neighbours:
-                
-                if (queue):
-                    if (neighbour != queue[-1]):
-                        queue.append(neighbour)
-                    else:
-                        continue
-                else:
-                    queue.append(neighbour)
 
     
     def get_num_routes(self, tail, head, weight):
@@ -199,6 +153,10 @@ class roadGraph:
         
         return True  
     
+
+
+
+## Answering Qs in main program :
 
 if __name__ == "__main__":
     #roadGraphs.run()
@@ -219,7 +177,9 @@ if __name__ == "__main__":
     cycle=False
     glob_iter=0
     
-    town_graph.printAllPathsUtil('A', 'C',visited,path_local)      
+    graph_copy=copy.copy(town_graph)
+    
+    town_graph.searchAllPathsUtil('A', 'C',visited,path_local)      
     
     
     
@@ -266,6 +226,19 @@ if __name__ == "__main__":
     ##to C (via D,C,D); and A to C (via D,E,B).
     
     
+    correct_result=[index for index,l in enumerate(paths_list) if len(l) == 5]
+    if not correct_result:
+        print("NO SUCH ROUTE ! \n")
+    else:      
+        if len(correct_result)>0:
+            num_such_paths=len(correct_result)
+    
+    print("\n Q. 7 Answer ---  The number of trips starting at A and ending at C with exactly 4 stops = \n")
+    
+    
+    print(str(num_such_paths) + "\n")
+    
+      
     
     
     ##8. The length of the shortest route (in terms of distance to travel) from A
@@ -291,8 +264,9 @@ if __name__ == "__main__":
     dist_list=[]
     num_town_list=[]
     visited =[False]*len(town_graph.nodes)
+    graph_copy=copy.copy(town_graph)
     # Call the recursive helper function to print all paths
-    town_graph.printAllPathsUtil('A', 'D',visited, path_local)      
+    town_graph.searchAllPathsUtil('A', 'D',visited, path_local)      
 
     
     
@@ -335,26 +309,98 @@ if __name__ == "__main__":
     #stops). and C-E-B-C (3 stops).
     
     
-    ##***** FOR Q 2  & 6: *****    
+    ##***** FOR Q 6: *****    
 
     ##RESET a-C route values and re-do for A->D:
     paths_list=[]
     dist_list=[]
     num_town_list=[]
     visited =[False]*len(town_graph.nodes)
+    graph_copy=copy.copy(town_graph)
+    
     # Call the recursive helper function to print all paths
-    town_graph.printAllPathsUtil('C', 'C',visited, path_local)      
+    town_graph.searchAllPathsUtil('C', 'C',visited, path_local)      
 
     
-    bla=-1
     
-#So rather than going down this rabbit hole, I guess it is maybe enough for me to use a non generalised solution (search)..?
+    correct_result=[index for index,l in enumerate(paths_list) if len(l) <= 4 ]
+    if not correct_result:
+        print("Q 6 -- answer :  NO SUCH ROUTE ! \n")
+    else:    
+        
+        print(" Q.6 The number of trips starting and ending with C that are 3 stops or less are : ... \n")
+        
+        print(len(correct_result))
+                
+        print("\n ... -and the trips are ... :   \n \n" ) 
+        
+    
+        
+        [print(paths_list[i]) for i in correct_result if correct_result]    
+ 
+ 
+
+
+    
+    #10. The number of different routes from C to C with a distance of less than
+    #30.      
+     
+    # Q 10 : All paths from C-C <  30 dist.:
+    all_cPaths=[index for index,l in enumerate(paths_list) ]
+    
+    if not all_cPaths:
+        print("NO SUCH ROUTE ! \n")
+    else:      
+        if len(all_cPaths)>=1:
+            dists=[dist_list[i] for i in all_cPaths if all_cPaths] 
+            indices=[i for i in all_cPaths if all_cPaths]
+    
+    paths_under_thirty=[]
+    for indx,dist in enumerate(dists):
+        if dist < 30:
+            paths_under_thirty.append(paths_list[all_cPaths[indices[indx]]])
+            
+    print(" \n  Q.10 Answer -  the no. paths  from C->C that are less than 30 units in distance is  ... :  \n \n")
+    
+    
+    print(str(len(paths_under_thirty)))
+    
+    for paths in paths_under_thirty:
+        print(str(paths) + "  \n ")
+        
+
+    
+    #So rather than going down this rabbit hole, I guess it is maybe enough for me to use a non generalised solution (search)..?
     
     
     #9. The length of the shortest route (in terms of distance to travel) from B
     #to B.
     
+    ##***** FOR Q 9: *****    
+
+    ##RESET a-C route values and re-do for A->D:
+    paths_list=[]
+    dist_list=[]
+    num_town_list=[]
+    visited =[False]*len(town_graph.nodes)
     
+    # Call the recursive helper function to print all paths
+    town_graph.searchAllPathsUtil('B', 'B',visited, path_local)      
+
+
+    correct_result=[index for index,l in enumerate(paths_list) ]
+    if not correct_result:
+        print("NO SUCH ROUTE ! \n")
+    else:      
+        if len(correct_result)>=1:
+            dists=[dist_list[i] for i in correct_result if correct_result]  
     
-    #10. The number of different routes from C to C with a distance of less than
-    #30.     
+    #find the minimum of these trip distances:
+    minDist=sys.maxsize
+    for index,dists in enumerate(dist_list):
+        
+        if dists < minDist:
+            minDist=dists
+     
+    print("Q 9 -- answer = -- shortest route is  " + str(minDist))                
+    
