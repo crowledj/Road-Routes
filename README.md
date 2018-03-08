@@ -4,18 +4,19 @@ A python task that uses directed graphs to describe a routing system between nei
                     ***********************  SUMMARY :   ***********************
                *********************************************************************      
 
-I decided to implement the Directed Graph model of the commuter route using a class based ?.
-The graph its is implemented with a dictionary of lists - i.e the adjacency list method for storage and retrievaql of each node's neighbours.
-I used the same data- structure for the other necessary structs - where the distances (weights) between towns (nodes) was donme using a nested 
-dictionary of integers.
+I decided to implement the Directed Graph model of the commuter route using a class based code layout.
+The graph itself is implemented with a dictionary of lists - i.e the adjacency list method for storage and retrievaql of each node's neighbours. In practise this was achieved with a defaultdictionary from python's collections library.
 
-I chose to use a recursive method - "printAllPathsUtil()" to search through the graph and save all unique routes between  given start and end vertices(towns).
+I used the same data- structure for the other necessary structs - where the distances (weights) between towns (nodes) was done using a nested dictionary of integers.
+
+I chose to use a recursive method - "searchAllPathsUtil()" to search through the graph and save all unique routes between  given start and end vertices(towns).
 
 Then once all these routes were stored for a given start and destination pt., I could use these to answer the Qs relating to this (source,dest.)
 Route. eg, min. dist , a given specific route.
 
 This was done in this manner so that I traverse "all"  routes while achieving generality.
-I also tracked visited nodes during this search so as to avoid cycles - which can lead to infinitely many solutions. 
+I also tracked visited nodes during this search so as to avoid cycles - which can lead to infinitely many solutions.
+
 
                *********************************************************************
                ********************    RUNNING INSTRUCTIONS :   ********************
